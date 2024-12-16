@@ -1,0 +1,192 @@
+from flask import Flask, render_template, jsonify
+import json
+
+app = Flask(__name__)
+
+# Sample product data
+with open('products.json') as f:
+    products = json.load(f)
+
+@app.route('/')
+def index():
+    """Displays the homepage with product list."""
+    return render_template('index.html', products=products)
+
+@app.route('/product/<int:product_id>')
+def product_detail(product_id):
+    """Displays details of a specific product."""
+    product = next((item for item in products if item['id'] == product_id), None)
+    if product:
+        return render_template('product_detail.html', product=product)
+    else:
+        return "Product not found", 404
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+    [
+  {
+    "id": 1,
+    "name": "Red Dress",
+    "description": "Elegant red dress for evening wear.",
+    "price": 49.99,
+    "image": "https://example.com/images/red_dress.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Blue Jeans",
+    "description": "Comfortable blue jeans for everyday use.",
+    "price": 29.99,
+    "image": "https://example.com/images/blue_jeans.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Leather Jacket",
+    "description": "Stylish leather jacket for casual looks.",
+    "price": 89.99,
+    "image": "https://example.com/images/leather_jacket.jpg"
+  }
+]
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fashion E-Commerce</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Welcome to Our Fashion Store</h1>
+    </header>
+
+    <main>
+        <h2>Featured Products</h2>
+        <div class="product-list">
+            {% for product in products %}
+                <div class="product-card">
+                    <img src="{{ product['image'] }}" alt="{{ product['name'] }}">
+                    <h3>{{ product['name'] }}</h3>
+                    <p>${{ product['price'] }}</p>
+                    <a href="{{ url_for('product_detail', product_id=product['id']) }}">View Details</a>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product['name'] }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>{{ product['name'] }}</h1>
+    </header>
+
+    <main>
+        <div class="product-detail">
+            <img src="{{ product['image'] }}" alt="{{ product['name'] }}">
+            <div class="product-info">
+                <p>{{ product['description'] }}</p>
+                <h3>${{ product['price'] }}</h3>
+                <button>Add to Cart</button>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #f4f4f4;
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    margin: 0;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+}
+
+.product-list {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+}
+
+.product-card {
+    border: 1px solid #ddd;
+    padding: 15px;
+    text-align: center;
+    width: 200px;
+}
+
+.product-card img {
+    max-width: 100%;
+    height: auto;
+}
+
+.product-card h3 {
+    font-size: 18px;
+    color: #555;
+}
+
+.product-card p {
+    color: #888;
+}
+
+.product-card a {
+    display: block;
+    margin-top: 10px;
+    text-decoration: none;
+    color: #007bff;
+}
+
+.product-detail {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.product-detail img {
+    width: 300px;
+    height: auto;
+}
+
+.product-info {
+    margin-left: 30px;
+}
+
+.product-info button {
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.product-info button:hover {
+    background-color: #218838;
+}
+document.addEventListener('DOMContentLoaded', function() {
+    const addToCartButton = document.querySelector('button');
+    addToCartButton.addEventListener('click', function() {
+        alert('Product added to cart!');
+    });
+});
